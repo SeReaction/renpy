@@ -1683,17 +1683,22 @@ def log(msg):
     if msg is None:
         return
 
-    if not logfile:
-        import codecs
+    try:
 
-        logfile = _file(renpy.config.log, "a")
-        if not logfile.tell():
-            logfile.write(codecs.BOM_UTF8)
+        if not logfile:
+            import codecs
+            logfile = _file(renpy.config.log, "a")
 
-    import textwrap
+            if not logfile.tell():
+                logfile.write(codecs.BOM_UTF8)
 
-    print >>logfile, textwrap.fill(msg).encode("utf-8")
-    logfile.flush()
+        import textwrap
+
+        print >>logfile, textwrap.fill(msg).encode("utf-8")
+        logfile.flush()
+
+    except:
+        renpy.config.log = None
 
 
 def force_full_redraw():
@@ -2382,6 +2387,9 @@ def list_files(common=False):
     rv = [ ]
 
     for dir, fn in renpy.loader.listdirfiles(common): #@ReservedAssignment
+        if fn.startswith("saves/"):
+            continue
+
         rv.append(fn)
 
     return rv
@@ -2599,6 +2607,21 @@ def set_physical_size(size):
     if get_renderer_info()["resizable"]:
         renpy.display.draw.quit()
         renpy.display.interface.set_mode(size)
+
+def reset_physical_size():
+    """
+    :doc: other
+
+    Attempts to set the size of the physical window to the specified values 
+    in renpy.config. (That is, screen_width and screen_height.) This has the
+    side effect of taking the screen out of fullscreen mode.
+    """
+
+    renpy.game.preferences.fullscreen = False
+
+    if get_renderer_info()["resizable"]:
+        renpy.display.draw.quit()
+        renpy.display.interface.set_mode((renpy.config.screen_width, renpy.config.screen_height))
 
 
 @renpy_pure

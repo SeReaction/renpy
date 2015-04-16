@@ -19,6 +19,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+version = 1
 
 cdef extern from "steam/steam_api.h":
     ctypedef bint bool
@@ -275,7 +276,7 @@ def set_int_stat(name, value):
     server.
     """
 
-    cdef int32 v
+    cdef int32 v = value
 
     return SteamUserStats().SetStat(<char *> name, v)
 
